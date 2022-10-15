@@ -6,7 +6,7 @@ running = True
 
 def enter():
     global logo_image
-    logo_image = load_image('logo(1).png')
+    logo_image = load_image('logo.png')
 
 def exit():
     global logo_image
@@ -23,7 +23,7 @@ def update():
 
 def draw():
     clear_canvas()
-    logo_image.draw(0, 0)
+    logo_image.draw(600, 350)
     update_canvas()
 
 open_canvas(1200, 700)
