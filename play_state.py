@@ -8,6 +8,17 @@ class Field:
     def draw(self):
         self.image.draw(400, 300)
 
+class Player:
+    def __init__(self):
+        self.x, self.y = 100, 100
+        self.frame = 0
+        self.image = load_image('Jog_right.png')
+    def update(self):
+        self.frame = (self.frame + 1) % 14
+        self.x += 5
+    def draw_right(self):
+        self.image.clip_draw(self.frame*97, 0, 100, 128, self.x, self.y)
+
 # 일반몹-1 클래스 정의
 class Mob1:
     def __init__(self):
@@ -34,15 +45,18 @@ def handle_events():
 running = True
 open_canvas()
 field = Field()
+player = Player()
 mob1 = Mob1()
 
 while running:
     handle_events()
 
+    player.update()
     mob1.update()
 
     clear_canvas()
     field.draw()
+    player.draw_right()
     mob1.draw()
     update_canvas()
 
