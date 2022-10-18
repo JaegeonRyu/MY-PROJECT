@@ -20,17 +20,23 @@ class Player:
     def draw_right(self):
         self.image.clip_draw(self.frame*129, 0, 129, 128, self.x, self.y)
 
+
 # 일반몹-1 클래스 정의
 class Mob1:
     def __init__(self):
         self.x, self.y = random.randint(50, 750), random.randint(50, 550)
         self.frame = random.randint(0, 11)
         self.image = load_image('zombie_0.png')
-    def update(self):
+    def update_right(self):
         self.frame = (self.frame + 1) % 12
         self.x -= 4
+    def update_left(self):
+        self.frame = (self.frame + 1) % 12
+        self.x += 4
     def draw_right(self):
         self.image.clip_draw(self.frame*128, 896, 128, 128, self.x, self.y)
+    def draw_left(self):
+        self.image.clip_draw(self.frame*128, 384, 128, 128, self.x, self.y)
 
 
 # 키 이벤트
@@ -57,7 +63,7 @@ while running:
     handle_events()
     player.update()
     for mob1 in Wave1:
-        mob1.update()
+        mob1.update_right()
 
     clear_canvas()
     field.draw()
@@ -66,6 +72,6 @@ while running:
         mob1.draw_right()
     update_canvas()
 
-    delay(0.05)
+    delay(0.07)
 
 close_canvas()
