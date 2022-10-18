@@ -32,19 +32,23 @@ class Mob1:
     def __init__(self):
         self.x, self.y = random.randint(50, 750), random.randint(50, 500)
         self.frame = random.randint(0, 11)
+        self.dir = -1
         self.image = load_image('zombie_0.png')
-    def update_right(self):
+    def update(self):
         self.frame = (self.frame + 1) % 12
-        self.x -= 4
-    def update_left(self):
-        self.frame = (self.frame + 1) % 12
-        self.x += 4
-    def draw_right(self):
-        self.image.clip_draw(self.frame*128, 896, 128, 128, self.x, self.y)
-    def draw_left(self):
-        self.image.clip_draw(self.frame*128, 384, 128, 128, self.x, self.y)
-
-
+        if self.dir == -1:
+            self.x -= 4
+            if self.x <= 10:
+                self.dir = 1
+        elif self.dir == 1:
+            self.x += 4
+            if self.x >= 790:
+                self.dir = -1
+    def draw(self):
+        if self.dir == -1:
+            self.image.clip_draw(self.frame*128, 896, 128, 128, self.x, self.y)
+        elif self.dir == 1:
+            self.image.clip_draw(self.frame*128, 384, 128, 128, self.x, self.y)
 # 키 이벤트
 def handle_events():
     global running
@@ -70,14 +74,14 @@ while running:
     handle_events()
     player.update()
     for mob1 in Wave1:
-        mob1.update_right()
+        mob1.update()
 
     clear_canvas()
     field.draw()
     wave1_UI.draw()
     # player.draw_right()
     for mob1 in Wave1:
-        mob1.draw_right()
+        mob1.draw()
     update_canvas()
 
     delay(0.07)
