@@ -50,16 +50,20 @@ open_canvas(WinW, WinH)
 field = Field()
 player = Player()
 mob1 = Mob1()
+# Wave1(5)
+Wave1 = [Mob1() for i in range(5)]
 
 while running:
     handle_events()
     player.update()
-    mob1.update()
+    for mob1 in Wave1:
+        mob1.update()
 
     clear_canvas()
     field.draw()
     # player.draw_right()
-    mob1.draw_right()
+    for mob1 in Wave1:
+        mob1.draw_right()
     update_canvas()
 
     delay(0.05)
