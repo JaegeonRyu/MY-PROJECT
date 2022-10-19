@@ -32,23 +32,37 @@ class Mob1:
     def __init__(self):
         self.x, self.y = random.randint(50, 750), random.randint(50, 500)
         self.frame = random.randint(0, 11)
-        self.dir = -1
-        self.image = load_image('zombie_0.png')
+        self.dir = random.randint(1, 4)
+        self.image = load_image('zombie_1.png')
     def update(self):
         self.frame = (self.frame + 1) % 12
-        if self.dir == -1:
+        if self.dir == 1:
             self.x -= 4
             if self.x <= 10:
-                self.dir = 1
-        elif self.dir == 1:
-            self.x += 4
+                self.dir = random.randint(1, 4)
+        if self.dir == 2:
+            self.x += 3
             if self.x >= 790:
-                self.dir = -1
+                self.dir = random.randint(1, 4)
+        if self.dir == 3:
+            self.y -= 3
+            if self.y <= 30:
+                self.dir = random.randint(1, 4)
+        if self.dir == 4:
+            self.y += 3
+            if self.y >= 550:
+                self.dir = random.randint(1, 4)
+
     def draw(self):
-        if self.dir == -1:
+        if self.dir == 1:
             self.image.clip_draw(self.frame*128, 896, 128, 128, self.x, self.y)
-        elif self.dir == 1:
+        if self.dir == 2:
             self.image.clip_draw(self.frame*128, 384, 128, 128, self.x, self.y)
+        if self.dir == 3:
+            self.image.clip_draw(self.frame * 128, 128, 128, 128, self.x, self.y)
+        if self.dir == 4:
+            self.image.clip_draw(self.frame * 128, 640, 128, 128, self.x, self.y)
+
 # 키 이벤트
 def handle_events():
     global running
