@@ -32,36 +32,64 @@ class Mob1:
     def __init__(self):
         self.x, self.y = random.randint(50, 750), random.randint(50, 500)
         self.frame = random.randint(0, 11)
-        self.dir = random.randint(1, 4)
+        self.dir = random.randint(1, 8)
         self.image = load_image('zombie_1.png')
     def update(self):
         self.frame = (self.frame + 1) % 12
-        if self.dir == 1:
+        if self.dir == 1:  # 왼쪽
             self.x -= 4
-            if self.x <= 10:
-                self.dir = random.randint(1, 4)
-        if self.dir == 2:
-            self.x += 3
-            if self.x >= 790:
-                self.dir = random.randint(1, 4)
-        if self.dir == 3:
-            self.y -= 3
-            if self.y <= 30:
-                self.dir = random.randint(1, 4)
-        if self.dir == 4:
+            if self.x <= 20:
+                self.dir = random.randint(1, 8)
+        if self.dir == 2:  # 왼쪽 위
+            self.x -= 3
+            self.y += 3
+            if self.x <= 20 or self.y >= 550:
+                self.dir = random.randint(1, 8)
+        if self.dir == 3:  # 위
             self.y += 3
             if self.y >= 550:
-                self.dir = random.randint(1, 4)
+                self.dir = random.randint(1, 8)
+        if self.dir == 4:  # 오른쪽 위
+            self.x += 3
+            self.y += 3
+            if self.x >= 780 or self.y >= 550:
+                self.dir = random.randint(1, 8)
+        if self.dir == 5:  # 오른쪽
+            self.x += 4
+            if self.x >= 780:
+                self.dir = random.randint(1, 8)
+        if self.dir == 6:  # 오른쪽 아래
+            self.x += 3
+            self.y -= 3
+            if self.x >= 780 or self.y <= 40:
+                self.dir = random.randint(1, 8)
+        if self.dir == 7:  # 아래
+            self.y -= 3
+            if self.y <= 40:
+                self.dir = random.randint(1, 8)
+        if self.dir == 8:  # 왼쪽 아래
+            self.x -= 3
+            self.y -= 3
+            if self.x <= 20 or self.y <= 40:
+                self.dir = random.randint(1, 8)
 
     def draw(self):
-        if self.dir == 1:
-            self.image.clip_draw(self.frame*128, 896, 128, 128, self.x, self.y)
-        if self.dir == 2:
-            self.image.clip_draw(self.frame*128, 384, 128, 128, self.x, self.y)
-        if self.dir == 3:
-            self.image.clip_draw(self.frame * 128, 128, 128, 128, self.x, self.y)
-        if self.dir == 4:
-            self.image.clip_draw(self.frame * 128, 640, 128, 128, self.x, self.y)
+        if self.dir == 1:  # 왼쪽
+            self.image.clip_draw(self.frame*128, 128*7, 128, 128, self.x, self.y)
+        if self.dir == 2:  # 왼쪽 위
+            self.image.clip_draw(self.frame*128, 128*6, 128, 128, self.x, self.y)
+        if self.dir == 3:  # 위
+            self.image.clip_draw(self.frame*128, 128*5, 128, 128, self.x, self.y)
+        if self.dir == 4:  # 오른쪽 위
+            self.image.clip_draw(self.frame*128, 128*4, 128, 128, self.x, self.y)
+        if self.dir == 5:  # 오른쪽
+            self.image.clip_draw(self.frame*128, 128*3, 128, 128, self.x, self.y)
+        if self.dir == 6:  # 오른쪽 아래
+            self.image.clip_draw(self.frame*128, 128*2, 128, 128, self.x, self.y)
+        if self.dir == 7:  # 아래
+            self.image.clip_draw(self.frame*128, 128*1, 128, 128, self.x, self.y)
+        if self.dir == 8:  # 왼쪽 아래
+            self.image.clip_draw(self.frame*128, 128*0, 128, 128, self.x, self.y)
 
 # 키 이벤트
 def handle_events():
@@ -82,7 +110,7 @@ player = Player()
 mob1 = Mob1()
 wave1_UI = Wave1_UI()
 # Wave1(5)
-Wave1 = [Mob1() for i in range(5)]
+Wave1 = [Mob1() for i in range(10)]
 
 while running:
     handle_events()
