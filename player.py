@@ -89,7 +89,7 @@ class RUN:
         elif self.X_dir == 1:
             self.r_image.clip_draw(self.frame*61, 0, 61, 60, self.x, self.y)
         elif self.Y_dir == -1:
-            self.d_image.clip_draw(self.frame*61, 0, 61, 60, self.x, self.y)
+            self.d_image.clip_draw(self.frame*62, 0, 61, 60, self.x, self.y)
         elif self.Y_dir == 1:
             self.u_image.clip_draw(self.frame*61, 0, 61, 60, self.x, self.y)
 
@@ -119,7 +119,7 @@ class Player:
         self.cur_state.enter(self, None)
 
     def update(self):
-        self.frame = (self.frame + 1) % 14
+        self.cur_state.do(self)
 
         if self.event_que:
             event = self.event_que.pop()
