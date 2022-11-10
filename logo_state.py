@@ -1,38 +1,37 @@
 from pico2d import *
+import play_state
+import game_framework
 
 logo_image = None
-logo_time = 0.0
 running = True
 
 def enter():
     global logo_image
-    logo_image = load_image('logo.png')
+    logo_image = load_image('game_start.png')
 
 def exit():
     global logo_image
     del logo_image
 
-def update():
-    global logo_time
-    global running
-    if logo_time > 1.0:
-        logo_time = 0
-        running = False
-    delay(0.01)
-    logo_time += 0.01
-
 def draw():
     clear_canvas()
-    logo_image.draw(600, 350)
+    logo_image.draw(400, 300)
     update_canvas()
 
-open_canvas(1200, 700)
+def handle_events():
+    events = get_events()
+    global running
+    for event in events:
+        if event.type == SDL_QUIT:
+            game_framework.quit()
+        elif event.type == SDL_KEYDOWN:
+            if event.key == SDLK_ESCAPE:
+                running = False
+            if event.key == SDLK_SPACE:
+                game_framework.change_state(play_state)
 
-while running:
-    enter()
-    update()
-    draw()
+def update():
+    pass
 
-close_canvas()
 
 
