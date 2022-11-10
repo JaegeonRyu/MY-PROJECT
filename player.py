@@ -18,6 +18,17 @@ key_event_table = {
     (SDL_KEYUP, SDLK_DOWN): DU
 }
 
+# Player Action Speed
+TIME_PER_ACTION = 0.5
+ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+FRAMES_PER_ACTION = 14
+
+PIXEL_PER_METER = 10.0 / 0.3
+RUN_SPEED_KPH = 20.0
+RUN_SPEED_MPM = RUN_SPEED_KPH * 1000.0 / 60.0
+RUN_SPEED_MPS = RUN_SPEED_MPM / 60.0
+RUN_SPEED_PPS = RUN_SPEED_MPS * PIXEL_PER_METER
+
 # 2. : 상태 클래스 구현
 class IDLE:
     @staticmethod
@@ -77,21 +88,21 @@ class RUN:
             self.fire_gun()
 
     def do(self):
-        self.frame = (self.frame + 1) % 14
-        self.x += self.X_dir
-        self.y += self.Y_dir
+        self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 14
+        self.x += self.X_dir * RUN_SPEED_PPS * game_framework.frame_time
+        self.y += self.Y_dir * RUN_SPEED_PPS * game_framework.frame_time
         self.x = clamp(0, self.x, 800)
         self.y = clamp(0, self.y, 600)
 
     def draw(self):
         if self.X_dir == -1:
-            self.l_image.clip_draw(self.frame*61, 0, 61, 60, self.x, self.y)
+            self.l_image.clip_draw(int(self.frame)*62, 0, 58, 60, self.x, self.y)
         elif self.X_dir == 1:
-            self.r_image.clip_draw(self.frame*61, 0, 61, 60, self.x, self.y)
+            self.r_image.clip_draw(int(self.frame)*62, 0, 60, 60, self.x, self.y)
         elif self.Y_dir == -1:
-            self.d_image.clip_draw(self.frame*62, 0, 61, 60, self.x, self.y)
+            self.d_image.clip_draw(int(self.frame)*62, 0, 60, 60, self.x, self.y)
         elif self.Y_dir == 1:
-            self.u_image.clip_draw(self.frame*61, 0, 61, 60, self.x, self.y)
+            self.u_image.clip_draw(int(self.frame)*62, 0, 60, 60, self.x, self.y)
 
 
 # 3. 상태 변환 구현
