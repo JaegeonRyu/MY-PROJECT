@@ -1,6 +1,7 @@
 from pico2d import *
 import game_world
 import game_framework
+from bullet import Bullet
 
 #1 : 이벤트 테이블 정의
 RD, LD, UD, DD, RU, LU, UU, DU, SPACE, TIMER = range(10)
@@ -24,7 +25,7 @@ ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 14
 
 PIXEL_PER_METER = 10.0 / 0.3
-RUN_SPEED_KPH = 20.0
+RUN_SPEED_KPH = 25.0
 RUN_SPEED_MPM = RUN_SPEED_KPH * 1000.0 / 60.0
 RUN_SPEED_MPS = RUN_SPEED_MPM / 60.0
 RUN_SPEED_PPS = RUN_SPEED_MPS * PIXEL_PER_METER
@@ -104,11 +105,57 @@ class RUN:
         elif self.Y_dir == 1:
             self.u_image.clip_draw(int(self.frame)*62, 0, 60, 60, self.x, self.y)
 
+class FIRE:
+
+    def enter(self, event):
+        print('ENTER FIRE')
+        self.frame = 0
+
+        if event == RD:
+            self.X_dir += 1
+        elif event == LD:
+            self.X_dir -= 1
+        elif event == RU:
+            self.X_dir -= 1
+        elif event == LU:
+            self.X_dir += 1
+        elif event == UD:
+            self.Y_dir += 1
+        elif event == DD:
+            self.Y_dir -= 1
+        elif event == UU:
+            self.Y_dir -= 1
+        elif event == DU:
+            self.Y_dir += 1
+
+    def exit(self, event):
+        # self.Xface_dir = self.X_dir
+        # self.Yface_dir = self.Y_dir
+        pass
+
+    def do(self):
+        self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 4
+        self.x += self.X_dir * RUN_SPEED_PPS * game_framework.frame_time
+        self.y += self.Y_dir * RUN_SPEED_PPS * game_framework.frame_time
+        self.x = clamp(0, self.x, 800)
+        self.y = clamp(0, self.y, 600)
+
+    def draw(self):
+        if self.Xface_dir == -1:
+            self.l_fire_image.clip_draw(int(self.frame) * 59, 0, 59, 60, self.x, self.y)
+        if self.Xface_dir == 1:
+            self.r_fire_image.clip_draw(int(self.frame) * 59, 0, 59, 59, self.x, self.y)
+        if self.Yface_dir == -1:
+            self.d_fire_image.clip_draw(int(self.frame) * 37, 0, 37, 60, self.x, self.y)
+        if self.Yface_dir == 1:
+            self.u_fire_image.clip_draw(int(self.frame) * 32, 0, 32, 60, self.x, self.y)
+
 
 # 3. 상태 변환 구현
 next_state = {
-    IDLE:  {RU: RUN,  LU: RUN,  UU: RUN,  DU: RUN,  RD: RUN,  LD: RUN, UD: RUN,  DD: RUN, SPACE: IDLE},
-    RUN:   {RU: IDLE, LU: IDLE, UU: IDLE, DU: IDLE, RD: IDLE, LD: IDLE, UD: IDLE, DD: IDLE, SPACE: RUN}
+    IDLE:  {RU: RUN,  LU: RUN,  UU: RUN,  DU: RUN,  RD: RUN,  LD: RUN, UD: RUN,  DD: RUN, SPACE: FIRE},
+    RUN:   {RU: IDLE, LU: IDLE, UU: IDLE, DU: IDLE, RD: IDLE, LD: IDLE, UD: IDLE, DD: IDLE, SPACE: FIRE},
+    FIRE: {RU: IDLE,  LU: IDLE,  UU: IDLE,  DU: IDLE,  RD: RUN,  LD: RUN, UD: RUN,  DD: RUN, SPACE: FIRE}
 }
 
 
@@ -116,7 +163,7 @@ class Player:
     def __init__(self):
         self.x, self.y = 400, 300
         self.frame = 0
-        self.X_dir, self.Y_dir, self.Xface_dir, self.Yface_dir = 1, 0, 0, 0
+        self.X_dir, self.Y_dir, self.Xface_dir, self.Yface_dir = 0, 0, 0, -1
         self.timer = 100
 
         self.image = load_image('walk_IDLE.png')
@@ -124,6 +171,10 @@ class Player:
         self.l_image = load_image('Jog_left.png')
         self.u_image = load_image('Jog_up.png')
         self.d_image = load_image('Jog_down.png')
+        self.r_fire_image = load_image('Fire_right.png')
+        self.l_fire_image = load_image('Fire_left.png')
+        self.u_fire_image = load_image('Fire_up.png')
+        self.d_fire_image = load_image('Fire_down.png')
 
         self.event_que = []
         self.cur_state = IDLE
@@ -157,5 +208,12 @@ class Player:
     def fire_gun(self):
         print('fire ball')
         # 발사 지점에 총알 생성
-        #ball = Ball(self.x, self.y, self.face_dir*2)
-        #game_world.add_object(ball, 1)
+        if self.Xface_dir == -1:
+            bullet = Bullet(self.x, self.y, self.Xface_dir*2, 0)
+        if self.Xface_dir == 1:
+            bullet = Bullet(self.x, self.y, self.Xface_dir*2, 0)
+        if self.Yface_dir == -1:
+            bullet = Bullet(self.x, self.y, 0, self.Yface_dir*2)
+        if self.Yface_dir == 1:
+            bullet = Bullet(self.x, self.y, 0, self.Yface_dir*2)
+        game_world.add_object(bullet, 1)

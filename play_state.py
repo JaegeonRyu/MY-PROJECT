@@ -1,77 +1,68 @@
 from pico2d import *
 import random
+import game_world
+import game_framework
 
-# 게임 필드 클래스 정의
-class Field:
-    def __init__(self):
-        self.image = load_image('grass03.png')
+from field_grass import Grass
+from player import Player
+from mob import Mob1, Mob2
 
-    def draw(self):
-        self.image.draw(400, 300)
+grass = None
+player = None
+mobs = []
 
-class Player:
-    def __init__(self):
-        self.x, self.y = 800, 100
-        self.frame = 0
-        self.image = load_image('Jog_left.png')
-    def update(self):
-        self.frame = (self.frame + 1) % 14
-        self.x -= 10
-    def draw_right(self):
-        self.image.clip_draw(self.frame*129, 0, 129, 128, self.x, self.y)
-
-
-# 일반몹-1 클래스 정의
-class Mob1:
-    def __init__(self):
-        self.x, self.y = random.randint(50, 750), random.randint(50, 550)
-        self.frame = random.randint(0, 11)
-        self.image = load_image('zombie_0.png')
-    def update_right(self):
-        self.frame = (self.frame + 1) % 12
-        self.x -= 4
-    def update_left(self):
-        self.frame = (self.frame + 1) % 12
-        self.x += 4
-    def draw_right(self):
-        self.image.clip_draw(self.frame*128, 896, 128, 128, self.x, self.y)
-    def draw_left(self):
-        self.image.clip_draw(self.frame*128, 384, 128, 128, self.x, self.y)
-
-
-# 키 이벤트
 def handle_events():
-    global running
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
-            running = False
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            running = False
+            game_framework.quit()
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
+            game_framework.quit()
+        else:
+            player.handle_event(event)
 
-WinW = 800
-WinH = 600
-running = True
-open_canvas(WinW, WinH)
-field = Field()
-player = Player()
-mob1 = Mob1()
-# Wave1(5)
-Wave1 = [Mob1() for i in range(5)]
+def enter():
+    global grass, player
+    grass = Grass()
+    player = Player()
+    game_world.add_object(grass, 0)
+    game_world.add_object(player, 1)
 
-while running:
-    handle_events()
-    player.update()
-    for mob1 in Wave1:
-        mob1.update_right()
+    global mobs
+    mobs = [Mob1() for i in range(5)] + [Mob2() for i in range(5)]
+    game_world.add_objects(mobs, 1)
+def update():
+    for game_object in game_world.all_objects():
+        game_object.update()
+    delay(0.01)
 
+def draw_world():
+    for game_object in game_world.all_objects():
+        game_object.draw()
+
+def draw():
     clear_canvas()
-    field.draw()
-    # player.draw_right()
-    for mob1 in Wave1:
-        mob1.draw_right()
+    draw_world()
     update_canvas()
 
-    delay(0.07)
+# 종료
+def exit():
+    game_world.clear()
 
-close_canvas()
+def pause():
+    pass
+
+def resume():
+    pass
+
+def test_self():
+    import play_state
+
+    pico2d.open_canvas()
+    game_framework.run(play_state)
+    pico2d.clear_canvas()
+
+if __name__ == '__main__':
+    test_self()
+
+
