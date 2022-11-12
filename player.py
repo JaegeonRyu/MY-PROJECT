@@ -92,8 +92,8 @@ class RUN:
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 14
         self.x += self.X_dir * RUN_SPEED_PPS * game_framework.frame_time
         self.y += self.Y_dir * RUN_SPEED_PPS * game_framework.frame_time
-        self.x = clamp(0, self.x, 800)
-        self.y = clamp(0, self.y, 600)
+        self.x = clamp(10, self.x, 780)
+        self.y = clamp(20, self.y, 520)
 
     def draw(self):
         if self.X_dir == -1:
@@ -129,16 +129,17 @@ class FIRE:
             self.Y_dir += 1
 
     def exit(self, event):
-        # self.Xface_dir = self.X_dir
-        # self.Yface_dir = self.Y_dir
-        pass
+        if SPACE == event:
+            self.fire_gun()
+
+
 
     def do(self):
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 4
         self.x += self.X_dir * RUN_SPEED_PPS * game_framework.frame_time
         self.y += self.Y_dir * RUN_SPEED_PPS * game_framework.frame_time
-        self.x = clamp(0, self.x, 800)
-        self.y = clamp(0, self.y, 600)
+        self.x = clamp(10, self.x, 780)
+        self.y = clamp(20, self.y, 520)
 
     def draw(self):
         if self.Xface_dir == -1:

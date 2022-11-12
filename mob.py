@@ -12,6 +12,11 @@ RUN_SPEED_MPM = RUN_SPEED_KPH * 1000.0 / 60.0
 RUN_SPEED_MPS = RUN_SPEED_MPM / 60.0
 RUN_SPEED_PPS = RUN_SPEED_MPS * PIXEL_PER_METER
 
+# RUN_SPEED_KPH = 5.0
+# RUN_SPEED_MPM = RUN_SPEED_KPH * 1000.0 / 60.0
+# RUN_SPEED_MPS = RUN_SPEED_MPM / 60.0
+# RUN_SPEED_PPS = RUN_SPEED_MPS * PIXEL_PER_METER
+
 # 일반몹-1 클래스
 class Mob1:
     image = None
@@ -33,16 +38,16 @@ class Mob1:
         if self.dir == 2:  # 왼쪽 위
             self.x += -1 * RUN_SPEED_PPS * game_framework.frame_time
             self.y += 1 * RUN_SPEED_PPS * game_framework.frame_time
-            if self.x <= 20 or self.y >= 550:
+            if self.x <= 20 or self.y >= 500:
                 self.dir = random.randint(1, 8)
         if self.dir == 3:  # 위
             self.y += 1 * RUN_SPEED_PPS * game_framework.frame_time
-            if self.y >= 550:
+            if self.y >= 500:
                 self.dir = random.randint(1, 8)
         if self.dir == 4:  # 오른쪽 위
             self.x += 1 * RUN_SPEED_PPS * game_framework.frame_time
             self.y += 1 * RUN_SPEED_PPS * game_framework.frame_time
-            if self.x >= 780 or self.y >= 550:
+            if self.x >= 780 or self.y >= 500:
                 self.dir = random.randint(1, 8)
         if self.dir == 5:  # 오른쪽
             self.x += 1 * RUN_SPEED_PPS * game_framework.frame_time
@@ -103,16 +108,16 @@ class Mob2:
         if self.dir == 2:  # 왼쪽 위
             self.x += -1 * RUN_SPEED_PPS * game_framework.frame_time
             self.y += 1 * RUN_SPEED_PPS * game_framework.frame_time
-            if self.x <= 20 or self.y >= 550:
+            if self.x <= 20 or self.y >= 500:
                 self.dir = random.randint(1, 8)
         if self.dir == 3:  # 위
             self.y += 1 * RUN_SPEED_PPS * game_framework.frame_time
-            if self.y >= 550:
+            if self.y >= 500:
                 self.dir = random.randint(1, 8)
         if self.dir == 4:  # 오른쪽 위
             self.x += 1 * RUN_SPEED_PPS * game_framework.frame_time
             self.y += 1 * RUN_SPEED_PPS * game_framework.frame_time
-            if self.x >= 780 or self.y >= 550:
+            if self.x >= 780 or self.y >= 500:
                 self.dir = random.randint(1, 8)
         if self.dir == 5:  # 오른쪽
             self.x += 1 * RUN_SPEED_PPS * game_framework.frame_time
