@@ -6,6 +6,7 @@ import game_framework
 from field_grass import Grass
 from player import Player
 from mob import Mob1, Mob2
+from game_UI import UI, GUN
 
 grass = None
 player = None
@@ -22,11 +23,15 @@ def handle_events():
             player.handle_event(event)
 
 def enter():
-    global grass, player
+    global grass, player, ui, gun
     grass = Grass()
     player = Player()
+    ui = UI()
+    gun = GUN()
     game_world.add_object(grass, 0)
     game_world.add_object(player, 1)
+    game_world.add_object(ui, 1)
+    game_world.add_object(gun, 2)
 
     global mobs
     mobs = [Mob1() for i in range(5)] + [Mob2() for i in range(5)]
