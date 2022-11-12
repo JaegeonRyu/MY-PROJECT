@@ -5,6 +5,7 @@ import game_framework
 
 from field_grass import Grass
 from player import Player
+from bullet import Bullet
 from mob import Mob1, Mob2
 from game_UI import UI, GUN
 
@@ -23,23 +24,34 @@ def handle_events():
             player.handle_event(event)
 
 def enter():
-    global grass, player, ui, gun
+    global grass, player, bullet, ui, gun
     grass = Grass()
     player = Player()
     ui = UI()
     gun = GUN()
+    bullet = Bullet()
     game_world.add_object(grass, 0)
     game_world.add_object(player, 1)
+    # game_world.add_object(bullet, 1)
     game_world.add_object(ui, 1)
     game_world.add_object(gun, 2)
 
     global mobs
     mobs = [Mob1() for i in range(5)] + [Mob2() for i in range(5)]
     game_world.add_objects(mobs, 1)
+    game_world.add_collision_group(mobs, bullet, 'bullet:mobs')
+    # game_world.add_collision_group(player, mobs, 'player:mobs')
+
 def update():
     for game_object in game_world.all_objects():
         game_object.update()
     delay(0.01)
+
+    for a, b, group in game_world.all_collision_pairs():
+        if collide(a, b):
+            print('collision by ', group)
+            a.handle_collision(b, group)
+            b.handle_collision(a, group)
 
 def draw_world():
     for game_object in game_world.all_objects():
@@ -49,6 +61,17 @@ def draw():
     clear_canvas()
     draw_world()
     update_canvas()
+
+def collide(a, b):
+    la, ba, ra, ta = a.get_bb()
+    lb, bb, rb, tb = b.get_bb()
+
+    if la > rb: return False
+    if ra < lb: return False
+    if ta < bb: return False
+    if ba > tb: return False
+
+    return True
 
 # 종료
 def exit():

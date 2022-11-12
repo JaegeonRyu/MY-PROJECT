@@ -111,6 +111,7 @@ class FIRE:
         print('ENTER FIRE')
         self.frame = 0
 
+
         if event == RD:
             self.X_dir += 1
         elif event == LD:
@@ -202,12 +203,13 @@ class Player:
     def draw(self):
         self.cur_state.draw(self)
         debug_print('PPPP')
+        # draw_rectangle(*self.get_bb())
 
     def add_event(self, event):
         self.event_que.insert(0, event)
 
     def fire_gun(self):
-        print('fire ball')
+        print('fire bullet')
         # 발사 지점에 총알 생성
         if self.Xface_dir == -1:
             bullet = Bullet(self.x, self.y, self.Xface_dir*2, 0)
@@ -218,3 +220,11 @@ class Player:
         if self.Yface_dir == 1:
             bullet = Bullet(self.x, self.y, 0, self.Yface_dir*2)
         game_world.add_object(bullet, 1)
+
+    def get_bb(self):
+        return self.x - 20, self.y - 30, self.x + 20, self.y + 30
+
+    def handle_collision(self, other, group):
+        print('player meet mobs')
+
+

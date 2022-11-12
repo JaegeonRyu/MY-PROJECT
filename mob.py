@@ -1,6 +1,7 @@
 from pico2d import *
 import random
 import game_framework
+import game_world
 
 TIME_PER_ACTION = 1.0
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
@@ -85,6 +86,17 @@ class Mob1:
             self.image.clip_draw(int(self.frame)*128, 128*1, 128, 128, self.x, self.y)
         if self.dir == 8:  # 왼쪽 아래
             self.image.clip_draw(int(self.frame)*128, 128*0, 128, 128, self.x, self.y)
+        # draw_rectangle(*self.get_bb())
+
+
+    def get_bb(self):
+        return self.x - 20, self.y - 40, self.x + 20, self.y + 20
+
+    def handle_collision(self, other, group):
+        print('bullet meet mob1')
+        if group == 'bullet:mobs':
+            game_world.remove_object(self)
+
 
 
 # 일반몹-2 클래스
@@ -155,3 +167,14 @@ class Mob2:
             self.image.clip_draw(int(self.frame)*128, 128*1, 128, 128, self.x, self.y)
         if self.dir == 8:  # 왼쪽 아래
             self.image.clip_draw(int(self.frame)*128, 128*0, 128, 128, self.x, self.y)
+        # draw_rectangle(*self.get_bb())
+
+    def get_bb(self):
+        return self.x - 20, self.y - 40, self.x + 20, self.y + 20
+
+    def handle_collision(self, other, group):
+        print('bullet meet mob2')
+        if group == 'bullet:mobs':
+            game_world.remove_object(self)
+
+
