@@ -8,7 +8,7 @@ ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 12
 
 PIXEL_PER_METER = 10.0 / 0.3
-RUN_SPEED_KPH = 5.0
+RUN_SPEED_KPH = 4.0
 RUN_SPEED_MPM = RUN_SPEED_KPH * 1000.0 / 60.0
 RUN_SPEED_MPS = RUN_SPEED_MPM / 60.0
 RUN_SPEED_PPS = RUN_SPEED_MPS * PIXEL_PER_METER
@@ -32,6 +32,7 @@ class Mob1:
 
     def update(self):
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+
         if self.dir == 1:  # 왼쪽
             self.x += -1 * RUN_SPEED_PPS * game_framework.frame_time
             if self.x <= 20:
@@ -176,5 +177,6 @@ class Mob2:
         print('bullet meet mob2')
         if group == 'bullet:mobs':
             game_world.remove_object(self)
+
 
 
