@@ -5,6 +5,8 @@ import play_state
 from bullet import Bullet
 from mob import Mob1, Mob2
 
+bullet = None
+
 #1 : 이벤트 테이블 정의
 RD, LD, UD, DD, RUD, LUD, RDD, LDD, RU, LU, UU, DU, RUU, LUU, RDU, LDU, SPACE, TIMER = range(18)
 event_name = ['RD', 'LD', 'UD', 'DD', 'RUD', 'LUD', 'RDD', 'LDD', 'RU', 'LU', 'UU', 'DU', 'RUU', 'LUU', 'RDU', 'LDU', 'TIMER', 'SPACE']
@@ -40,6 +42,7 @@ RUN_SPEED_MPM = RUN_SPEED_KPH * 1000.0 / 60.0
 RUN_SPEED_MPS = RUN_SPEED_MPM / 60.0
 RUN_SPEED_PPS = RUN_SPEED_MPS * PIXEL_PER_METER
 
+
 # 2. : 상태 클래스 구현
 class IDLE:
     @staticmethod
@@ -52,7 +55,7 @@ class IDLE:
         print('EXIT IDLE')
         if SPACE == event:
             # self.fire_gun()
-            play_state.fire_gun()
+            self.fire_gun()
 
     @staticmethod
     def do(self):
@@ -79,6 +82,7 @@ class IDLE:
             self.image.clip_draw(66*12, 0, 66, 60, self.x, self.y)
         elif self.Dface_dir == 1:
             self.image.clip_draw(66*14, 0, 66, 60, self.x, self.y)
+
 
 class RUN:
     def enter(self, event):
@@ -124,7 +128,7 @@ class RUN:
         self.Dface_dir = self.D_dir
         if SPACE == event:
             # self.fire_gun()
-            play_state.fire_gun()
+            self.fire_gun()
     def do(self):
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 14
         if self.X_dir == 1 or self.X_dir == -1:
@@ -164,8 +168,6 @@ class RUN:
         elif self.D_dir == -1:
             self.ld_image.clip_draw(int(self.frame) * 54, 0, 54, 60, self.x, self.y)
 
-
-
 class FIRE:
 
     def enter(self, event):
@@ -193,8 +195,7 @@ class FIRE:
     def exit(self, event):
         if SPACE == event:
             # self.fire_gun()
-            play_state.fire_gun()
-
+            self.fire_gun()
 
     def do(self):
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 4
@@ -280,19 +281,19 @@ class Player:
     def add_event(self, event):
         self.event_que.insert(0, event)
 
-    # def fire_gun(self):
-    #     print('fire bullet')
-    #     # 발사 지점에 총알 생성
-    #     if self.Xface_dir == -1:
-    #         bullet = [Bullet(self.x, self.y, self.Xface_dir*2, 0)]
-    #     if self.Xface_dir == 1:
-    #         bullet = [Bullet(self.x, self.y, self.Xface_dir*2, 0)]
-    #     if self.Yface_dir == -1:
-    #         bullet = [Bullet(self.x, self.y, 0, self.Yface_dir*2)]
-    #     if self.Yface_dir == 1:
-    #         bullet = [Bullet(self.x, self.y, 0, self.Yface_dir*2)]
-    #     game_world.add_objects(bullet, 1)
-
+    def fire_gun(self):
+        print('fire bullet')
+        # 발사 지점에 총알 생성
+        if self.Xface_dir == -1:
+            bullet = [Bullet(self.x, self.y, self.Xface_dir*2, 0)]
+        if self.Xface_dir == 1:
+            bullet = [Bullet(self.x, self.y, self.Xface_dir*2, 0)]
+        if self.Yface_dir == -1:
+            bullet = [Bullet(self.x, self.y, 0, self.Yface_dir*2)]
+        if self.Yface_dir == 1:
+            bullet = [Bullet(self.x, self.y, 0, self.Yface_dir*2)]
+        game_world.add_objects(bullet, 1)
+        game_world.add_collision_group(play_state.mobs, bullet, 'bullet:mobs')
 
     def get_bb(self):
         return self.x - 20, self.y - 30, self.x + 20, self.y + 30

@@ -11,6 +11,7 @@ from game_UI import UI, GUN
 
 grass = None
 player = None
+bullet = None
 mobs = []
 
 def handle_events():
@@ -29,7 +30,7 @@ def enter():
     player = Player()
     ui = UI()
     gun = GUN()
-    bullet = Bullet()
+
     game_world.add_object(grass, 0)
     game_world.add_object(player, 1)
     # game_world.add_object(bullet, 1)
@@ -37,9 +38,10 @@ def enter():
     game_world.add_object(gun, 2)
 
     global mobs
-    mobs = [Mob1() for i in range(5)] + [Mob2() for i in range(5)]
+    mobs = [Mob1() for i in range(10)] + [Mob2() for i in range(10)]
     game_world.add_objects(mobs, 1)
-    game_world.add_collision_group(mobs, bullet, 'bullet:mobs')
+    
+
     # game_world.add_collision_group(player, mobs, 'player:mobs')
 
 def update():
