@@ -6,14 +6,14 @@ class UI:
     def __init__(self):
         self.image = load_image('DAY_1.png')
     def draw(self):
-        self.image.draw(400, 580)
+        self.image.draw(400, 570)
     def update(self):
         pass
 
 class GUN:
     def __init__(self):
-        self.image = load_image('ar.png')
+        self.ar_image = load_image('ar.png')
     def draw(self):
-        self.image.draw(70, 580)
+        self.ar_image.draw(70, 570)
     def update(self):
         pass
