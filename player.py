@@ -278,7 +278,7 @@ class Player:
     def draw(self):
         self.cur_state.draw(self)
         debug_print('PPPP')
-        # draw_rectangle(*self.get_bb())
+        draw_rectangle(*self.get_bb())
 
     def add_event(self, event):
         self.event_que.insert(0, event)
@@ -298,7 +298,7 @@ class Player:
         game_world.add_collision_pairs(play_state.mobs, bullet, 'bullet:mobs')
 
     def get_bb(self):
-        return self.x - 20, self.y - 30, self.x + 20, self.y + 30
+        return self.x, self.y - 25, self.x + 20, self.y + 25
 
     def handle_collision(self, other, group):
         if group == 'player:mobs':

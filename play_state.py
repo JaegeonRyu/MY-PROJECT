@@ -33,12 +33,12 @@ def enter():
     game_world.add_object(grass, 0)
 
     server.player = Player()
-    game_world.add_object(server.player, 1)
+    game_world.add_object(server.player, 2)
 
     game_world.add_object(ui, 1)
     game_world.add_object(gun, 2)
 
-    mobs = [Mob1() for i in range(1)] # [Mob2() for i in range(10)]
+    mobs = [Mob1() for i in range(3)] + [Mob2() for i in range(1)]
     game_world.add_objects(mobs, 1)
     game_world.add_collision_pairs(server.player, mobs, 'player:mobs')
 
