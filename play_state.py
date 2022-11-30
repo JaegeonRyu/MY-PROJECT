@@ -2,15 +2,15 @@ from pico2d import *
 import random
 import game_world
 import game_framework
+import server
 
 from field_grass import Grass
-from player import Player
 from bullet import Bullet
+from player import Player
 from mob import Mob1, Mob2
 from game_UI import UI, GUN
 
 grass = None
-player = None
 bullet = None
 mobs = []
 
@@ -22,27 +22,25 @@ def handle_events():
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
             game_framework.quit()
         else:
-            player.handle_event(event)
+            server.player.handle_event(event)
 
 def enter():
-    global grass, player, bullet, ui, gun
-    grass = Grass()
-    player = Player()
+    global grass, player, bullet, ui, gun, mobs
     ui = UI()
     gun = GUN()
 
+    grass = Grass()
     game_world.add_object(grass, 0)
-    game_world.add_object(player, 1)
-    # game_world.add_object(bullet, 1)
+
+    server.player = Player()
+    game_world.add_object(server.player, 1)
+
     game_world.add_object(ui, 1)
     game_world.add_object(gun, 2)
 
-    global mobs
-    mobs = [Mob1() for i in range(10)] + [Mob2() for i in range(10)]
+    mobs = [Mob1() for i in range(1)] # [Mob2() for i in range(10)]
     game_world.add_objects(mobs, 1)
-    
-
-    # game_world.add_collision_group(player, mobs, 'player:mobs')
+    game_world.add_collision_pairs(server.player, mobs, 'player:mobs')
 
 def update():
     for game_object in game_world.all_objects():

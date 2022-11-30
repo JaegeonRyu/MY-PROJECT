@@ -2,6 +2,7 @@ from pico2d import *
 import game_world
 import game_framework
 import play_state
+import gameover_state
 from bullet import Bullet
 from mob import Mob1, Mob2
 
@@ -230,6 +231,7 @@ class Player:
         self.X_dir, self.Y_dir, self.Xface_dir, self.Yface_dir = 0, 0, 0, -1
         self.U_dir, self.D_dir, self.Uface_dir, self.Dface_dir = 0, 0, 0, 0
         self.timer = 100
+        self.HP = 1.0
 
         self.image = load_image('walk_IDLE.png')
         self.r_image = load_image('Jog_right.png')
@@ -293,12 +295,19 @@ class Player:
         if self.Yface_dir == 1:
             bullet = [Bullet(self.x, self.y, 0, self.Yface_dir*2)]
         game_world.add_objects(bullet, 1)
-        game_world.add_collision_group(play_state.mobs, bullet, 'bullet:mobs')
+        game_world.add_collision_pairs(play_state.mobs, bullet, 'bullet:mobs')
 
     def get_bb(self):
         return self.x - 20, self.y - 30, self.x + 20, self.y + 30
 
     def handle_collision(self, other, group):
-        pass
+        if group == 'player:mobs':
+            self.HP = self.HP - 0.02
+            print(self.HP)
+            if self.HP <= 0:
+                game_world.remove_object(self)
+                game_framework.change_state(gameover_state)
+
+
 
 
