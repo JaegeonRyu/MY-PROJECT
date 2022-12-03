@@ -4,12 +4,14 @@ import game_framework
 import game_world
 import server
 import math
+from blood import Blood
 from BehaviorTree import BehaviorTree, SelectorNode, SequenceNode, LeafNode
 
 TIME_PER_ACTION = 1.0
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-FRAMES_PER_ACTION = 12
+FRAMES_PER_ACTION = 10
 FRAMES_PER_DEATH_ACTION = 8
+FRAMES_PER_ATTACK_ACTION = 8
 
 # 좀비 1
 PIXEL_PER_METER = 10.0 / 0.3
@@ -30,19 +32,19 @@ class Mob1:
     blood_image = None
     def __init__(self):
         if Mob1.image == None:
-            Mob1.image = load_image('zombie_1.png')
-        if Mob1.blood_image == None:
-            Mob1.blood_image = load_image('blood_2.png')
+            Mob1.image = load_image('resources\\zombie_1.png')
 
-        self.x, self.y = random.randint(50, 750), random.randint(50, 500)
+        self.x, self.y = random.randint(50, 200), random.randint(20, 520)
         self.death_x, self.death_y = self.x, self.y
-        self.frame = random.randint(0, 11)
         self.dir = random.random()*2*math.pi
         self.death_dir = self.dir
+        self.attack_dir = self.dir
         self.build_behavior_tree()
-        self.HP = 1.0
+        self.hp = 1.0
         self.state = 'live'
+        self.frame = random.randint(0, 11)
         self.death_frame = 28
+        self.attack_frame = 12
         self.speed = RUN1_SPEED_PPS
 
     def update(self):
@@ -55,6 +57,16 @@ class Mob1:
             self.death_frame = (self.death_frame + FRAMES_PER_DEATH_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 36
             if self.death_frame >= 35:
                 self.death_frame = 35
+
+        elif self.state == 'attack':
+            self.attack_dir = self.dir
+            self.attack_frame = (self.attack_frame + FRAMES_PER_ATTACK_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 23
+            if self.attack_frame >= 22:
+                self.state = 'live'
+                self.attack_frame = 12
+                self.speed = RUN1_SPEED_PPS
+
+
 
         # 왼쪽
         if -math.pi <= self.dir < -math.pi*7/8 or math.pi*7/8 < self.dir <= math.pi:
@@ -131,7 +143,27 @@ class Mob1:
                 self.image.clip_draw(int(self.death_frame) * 128, 128 * 1, 128, 128, self.x, self.y)
             elif -math.pi * 7/8 < self.death_dir < -math.pi * 5/8:
                 self.image.clip_draw(int(self.death_frame) * 128, 128 * 0, 128, 128, self.x, self.y)
+
+        if self.state == 'attack':
+            if -math.pi <= self.attack_dir <= -math.pi * 7/8 or math.pi * 7/8 < self.attack_dir <= math.pi:
+                self.image.clip_draw(int(self.attack_frame) * 128, 128 * 7, 128, 128, self.x, self.y)
+            elif math.pi * 5/8 < self.attack_dir < math.pi * 7/8:
+                self.image.clip_draw(int(self.attack_frame) * 128, 128 * 6, 128, 128, self.x, self.y)
+            elif math.pi * 3/8 < self.attack_dir < math.pi * 5/8:
+                self.image.clip_draw(int(self.attack_frame) * 128, 128 * 5, 128, 128, self.x, self.y)
+            elif math.pi * 1/8 < self.attack_dir < math.pi * 3/8:
+                self.image.clip_draw(int(self.attack_frame) * 128, 128 * 4, 128, 128, self.x, self.y)
+            elif 0.0 <= self.attack_dir < math.pi * 1/8 or -math.pi * 1/8 < self.attack_dir <= 0:
+                self.image.clip_draw(int(self.attack_frame) * 128, 128 * 3, 128, 128, self.x, self.y)
+            elif -math.pi * 3/8 < self.attack_dir < -math.pi * 1/8:
+                self.image.clip_draw(int(self.attack_frame) * 128, 128 * 2, 128, 128, self.x, self.y)
+            elif -math.pi * 5/8 < self.attack_dir < -math.pi * 3/8:
+                self.image.clip_draw(int(self.attack_frame) * 128, 128 * 1, 128, 128, self.x, self.y)
+            elif -math.pi * 7/8 < self.attack_dir < -math.pi * 5/8:
+                self.image.clip_draw(int(self.attack_frame) * 128, 128 * 0, 128, 128, self.x, self.y)
+
         draw_rectangle(*self.get_bb())
+        draw_rectangle(*self.get_attack_bb())
 
 
     def find_player(self):
@@ -155,38 +187,61 @@ class Mob1:
         self.bt = BehaviorTree(chase_node)
 
     def get_bb(self):
-        if self.state == 'live':
-            return self.x - 10, self.y - 30, self.x + 10, self.y + 15
+        if self.state == 'live' or self.state == 'attack':
+            return self.x - 25, self.y - 40, self.x + 25, self.y + 20
         else:
-            return -10, -10, 0, 0
+            return -1, -1, 0, 0
+
+    def get_attack_bb(self):
+        if self.state == 'attack' and 13 <= self.attack_frame <= 16:
+            if -math.pi <= self.attack_dir < -math.pi * 7 / 8 or math.pi * 7 / 8 < self.attack_dir <= math.pi:
+                return self.x - 35, self.y - 20, self.x - 10, self.y + 20
+            elif math.pi * 5/8 < self.attack_dir < math.pi * 7/8:
+                return self.x, self.y, self.x + 30, self.y + 20
+            elif math.pi * 3/8 < self.attack_dir < math.pi * 5/8:
+                return self.x - 20, self.y + 20, self.x + 20, self.y + 30
+            elif math.pi * 1/8 < self.attack_dir < math.pi * 3/8:
+                return self.x, self.y, self.x + 30, self.y + 20
+            elif 0.0 <= self.attack_dir < math.pi * 1/8 or -math.pi * 1/8 < self.attack_dir <= 0:
+                return self.x, self.y, self.x + 30, self.y + 20
+            elif -math.pi * 3/8 < self.attack_dir < -math.pi * 1/8:
+                return self.x, self.y, self.x + 30, self.y + 20
+            elif -math.pi * 5/8 < self.attack_dir < -math.pi * 3/8:
+                return self.x, self.y, self.x + 30, self.y + 20
+            elif -math.pi * 7/8 < self.attack_dir < -math.pi * 5/8:
+                return self.x, self.y, self.x + 30, self.y + 20
+            else:
+                return 0, 0, 0, 0
+        else:
+            return 1, 1, 0, 0
+
 
     def handle_collision(self, other, group):
-        print('bullet meet mob1')
         if group == 'bullet:mobs':
-            self.HP = self.HP - 0.4
-
+            self.hp = self.hp - 0.4
+            server.blood = [Blood(self.x, self.y)]
             # 피격 시 넉백
             if server.player.Xface_dir < 0:
-                self.x -= 20
-                self.blood_image.draw(self.x, self.y)
+                self.x -= 10
             elif server.player.Xface_dir > 0:
-                self.x += 20
+                self.x += 10
             elif server.player.Yface_dir < 0:
-                self.y -= 15
+                self.y -= 10
             elif server.player.Yface_dir > 0:
-                self.y += 15
+                self.y += 10
 
             # 체력이 0이하가 되면 사망
-            if self.HP <= 0.0:
+            if self.hp <= 0.0:
                 self.state = 'dead'
                 self.speed = 0
                 self.death_dir = self.dir
                 # self.x, self.y = 800, 600
                 # game_world.remove_object(self)
 
-        elif group == 'mobs:mobs':
-            self.get_bb()
-            pass
+        elif group == 'player:mobs': # and (self.state == 'live' or self.state == 'attack'):
+            self.state = 'attack'
+            self.speed = 0
+
 
 
 
@@ -195,7 +250,7 @@ class Mob2:
     image = None
     def __init__(self):
         if Mob2.image == None:
-            Mob2.image = load_image('zombie_2.png')
+            Mob2.image = load_image('resources\\zombie_2.png')
 
         self.x, self.y = random.randint(50, 750), random.randint(50, 500)
         self.death_x, self.death_y = self.x, self.y
@@ -203,7 +258,7 @@ class Mob2:
         self.dir = random.random()*2*math.pi
         self.death_dir = self.dir
         self.build_behavior_tree()
-        self.HP = 1.0
+        self.hp = 1.0
         self.state = 'live'
         self.death_frame = 28
         self.speed = RUN2_SPEED_PPS
@@ -294,7 +349,7 @@ class Mob2:
                 self.image.clip_draw(int(self.death_frame) * 128, 128 * 1, 128, 128, self.x, self.y)
             elif -math.pi * 7/8 < self.death_dir < -math.pi * 5/8:
                 self.image.clip_draw(int(self.death_frame) * 128, 128 * 0, 128, 128, self.x, self.y)
-        draw_rectangle(*self.get_bb())
+        # draw_rectangle(*self.get_bb())
 
 
     def find_player(self):
@@ -326,7 +381,7 @@ class Mob2:
     def handle_collision(self, other, group):
         print('bullet meet mob1')
         if group == 'bullet:mobs':
-            self.HP = self.HP - 0.5
+            self.hp = self.hp - 0.5
 
             # 피격 시 넉백
             if server.player.Xface_dir < 0:
@@ -339,7 +394,7 @@ class Mob2:
                 self.y += 15
 
             # 체력이 0이하가 되면 사망
-            if self.HP <= 0.0:
+            if self.hp <= 0.0:
                 self.state = 'dead'
                 self.speed = 0
                 self.death_dir = self.dir
@@ -349,6 +404,7 @@ class Mob2:
         elif group == 'mobs:mobs':
             self.get_bb()
             pass
+
 
 
 

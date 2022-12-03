@@ -9,6 +9,7 @@ from bullet import Bullet
 from player import Player
 from mob import Mob1, Mob2
 from game_UI import UI, GUN
+from blood import Blood
 
 grass = None
 bullet = None
@@ -25,12 +26,15 @@ def handle_events():
             server.player.handle_event(event)
 
 def enter():
-    global grass, player, bullet, ui, gun, mobs
+    global grass, player, bullet, ui, gun, mobs, blood
     ui = UI()
     gun = GUN()
 
     grass = Grass()
     game_world.add_object(grass, 0)
+
+    server.blood = Blood()
+    game_world.add_object(server.blood, 1)
 
     server.player = Player()
     game_world.add_object(server.player, 2)
@@ -38,7 +42,7 @@ def enter():
     game_world.add_object(ui, 1)
     game_world.add_object(gun, 2)
 
-    mobs = [Mob1() for i in range(3)] + [Mob2() for i in range(1)]
+    mobs = [Mob1() for i in range(1)] + [Mob2() for i in range(1)]
     game_world.add_objects(mobs, 1)
     game_world.add_collision_pairs(server.player, mobs, 'player:mobs')
 

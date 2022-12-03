@@ -6,7 +6,7 @@ logo_image = None
 
 def enter():
     global logo_image
-    logo_image = load_image('game_start.png')
+    logo_image = load_image('resources\\game_start.png')
 
 def exit():
     global logo_image

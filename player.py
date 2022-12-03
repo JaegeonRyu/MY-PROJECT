@@ -3,6 +3,7 @@ import game_world
 import game_framework
 import play_state
 import gameover_state
+import server
 from bullet import Bullet
 from mob import Mob1, Mob2
 
@@ -231,27 +232,29 @@ class Player:
         self.X_dir, self.Y_dir, self.Xface_dir, self.Yface_dir = 0, 0, 0, -1
         self.U_dir, self.D_dir, self.Uface_dir, self.Dface_dir = 0, 0, 0, 0
         self.timer = 100
-        self.HP = 1.0
+        self.HP = 1.0 * 100
 
-        self.image = load_image('walk_IDLE.png')
-        self.r_image = load_image('Jog_right.png')
-        self.l_image = load_image('Jog_left.png')
-        self.u_image = load_image('Jog_up.png')
-        self.d_image = load_image('Jog_down.png')
+        self.image = load_image('resources\\walk_IDLE.png')
+        self.r_image = load_image('resources\\Jog_right.png')
+        self.l_image = load_image('resources\\Jog_left.png')
+        self.u_image = load_image('resources\\Jog_up.png')
+        self.d_image = load_image('resources\\Jog_down.png')
 
-        self.ru_image = load_image('Jog_right_up.png')
-        self.rd_image = load_image('Jog_right_down.png')
-        self.lu_image = load_image('Jog_left_up.png')
-        self.ld_image = load_image('Jog_left_down.png')
+        self.ru_image = load_image('resources\\Jog_right_up.png')
+        self.rd_image = load_image('resources\\Jog_right_down.png')
+        self.lu_image = load_image('resources\\Jog_left_up.png')
+        self.ld_image = load_image('resources\\Jog_left_down.png')
 
-        self.r_fire_image = load_image('Fire_right.png')
-        self.l_fire_image = load_image('Fire_left.png')
-        self.u_fire_image = load_image('Fire_up.png')
-        self.d_fire_image = load_image('Fire_down.png')
+        self.r_fire_image = load_image('resources\\Fire_right.png')
+        self.l_fire_image = load_image('resources\\Fire_left.png')
+        self.u_fire_image = load_image('resources\\Fire_up.png')
+        self.d_fire_image = load_image('resources\\Fire_down.png')
 
         self.event_que = []
         self.cur_state = IDLE
         self.cur_state.enter(self, None)
+
+
 
 
     def update(self):
@@ -298,15 +301,19 @@ class Player:
         game_world.add_collision_pairs(play_state.mobs, bullet, 'bullet:mobs')
 
     def get_bb(self):
-        return self.x, self.y - 25, self.x + 20, self.y + 25
+        return self.x, self.y - 25, self.x + 30, self.y + 25
 
     def handle_collision(self, other, group):
+        mob1 = Mob1()
         if group == 'player:mobs':
+            print('1')
             self.HP = self.HP - 0.02
             print(self.HP)
-            if self.HP <= 0:
-                game_world.remove_object(self)
-                game_framework.change_state(gameover_state)
+            # if self.HP <= 0:
+            #     game_world.remove_object(self)
+            #     game_framework.change_state(gameover_state)
+
+
 
 
 

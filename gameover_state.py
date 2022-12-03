@@ -7,7 +7,7 @@ running = True
 
 def enter():
     global over_image
-    over_image = load_image('game_over.png')
+    over_image = load_image('resources\\game_over.png')
 
 def exit():
     global over_image
