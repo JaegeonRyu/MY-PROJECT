@@ -16,9 +16,9 @@ BULLET_SPEED_PPS = BULLET_SPEED_MPS * PIXEL_PER_METER
 class Bullet:
     image = None
 
-    def __init__(self, x=0, y=0, x_velocity=1, y_velocity=1):
+    def __init__(self, x, y, x_velocity, y_velocity):
         if Bullet.image == None:
-            Bullet.image = load_image('bullet.png')
+            Bullet.image = load_image('resources\\bullet.png')
         self.x, self.y, self.x_velocity, self.y_velocity = x, y, x_velocity, y_velocity
         self.bullet_frame = 0
         self.frame = 0
@@ -54,7 +54,10 @@ class Bullet:
             game_world.remove_object(self)
 
     def get_bb(self):
-        return self.x - 10, self.y - 5, self.x + 10, self.y + 5
+        if self.x_velocity > 0 or self.x_velocity < 0:
+             return self.x+10, self.y+10, self.x + 25, self.y + 20
+        if self.y_velocity > 0 or self.y_velocity < 0:
+            return self.x-5, self.y, self.x + 5, self.y + 20
 
     def handle_collision(self, other, group):
         if group == 'bullet:mobs':
