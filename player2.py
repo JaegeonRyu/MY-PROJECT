@@ -3,6 +3,7 @@ import game_world
 import game_framework
 import play_state
 import server
+import gameover_state
 from bullet import Bullet
 from mob import Mob1, Mob2
 
@@ -36,82 +37,47 @@ RUN_SPEED_PPS = RUN_SPEED_MPS * PIXEL_PER_METER
 
 
 # 2. : 상태 클래스 구현
-class IDLE:
+class WalkingState:
     @staticmethod
     def enter(player, event):
-        print('ENTER IDLE')
-        player.Xface_dir, player.Yface_dir = 0, 0
 
-    @staticmethod
-    def exit(player, event):
-        print('EXIT IDLE')
-        if SPACE == event:
-            # self.fire_gun()
-            player.fire_gun()
+        player.X_dir, player.Y_dir = 0, 0
 
-    @staticmethod
-    def do(player):
-        player.frame = (player.frame + 1) % 14
-
-    @staticmethod
-    def draw(player):
-        if player.Xface_dir == 1:
-            player.image.clip_draw(0, 0, 66, 60, player.x, player.y)
-            if player.Yface_dir == 1:
-                player.image.clip_draw(66*2, 0, 66, 60, player.x, player.y)
-            elif player.Yface_dir == -1:
-                player.image.clip_draw(66 * 14, 0, 66, 60, player.x, player.y)
-
-        elif player.Xface_dir == -1:
-            player.image.clip_draw(66 * 8, 0, 66, 60, player.x, player.y)
-            if player.Yface_dir == 1:
-                player.image.clip_draw(66 * 6, 0, 66, 60, player.x, player.y)
-            elif player.Yface_dir == -1:
-                player.image.clip_draw(66 * 10, 0, 66, 60, player.x, player.y)
-
-        elif player.Yface_dir == 1:
-            player.image.clip_draw(66*4, 0, 66, 60, player.x, player.y)
-        elif player.Yface_dir == -1:
-            player.image.clip_draw(66*12, 0, 66, 60, player.x, player.y)
-
-
-class RUN:
-    def enter(player, event):
-        print('ENTER RUN')
         if event == RIGHTKEY_DOWN:
             player.x_velocity += RUN_SPEED_PPS
-            player.Xface_dir += 1
+            player.X_dir += 1
         elif event == RIGHTKEY_UP:
             player.x_velocity -= RUN_SPEED_PPS
-            player.Xface_dir -= 1
+            player.X_dir -= 1
         if event == LEFTKEY_DOWN:
             player.x_velocity -= RUN_SPEED_PPS
-            player.Xface_dir -= 1
+            player.X_dir -= 1
         elif event == LEFTKEY_UP:
             player.x_velocity += RUN_SPEED_PPS
-            player.Xface_dir += 1
+            player.X_dir += 1
 
         if event == UPKEY_DOWN:
             player.y_velocity += RUN_SPEED_PPS
-            player.Yface_dir += 1
+            player.Y_dir += 1
         elif event == UPKEY_UP:
             player.y_velocity -= RUN_SPEED_PPS
-            player.Yface_dir -= 1
+            player.Y_dir -= 1
         if event == DOWNKEY_DOWN:
             player.y_velocity -= RUN_SPEED_PPS
-            player.Yface_dir -= 1
+            player.Y_dir -= 1
         elif event == DOWNKEY_UP:
             player.y_velocity += RUN_SPEED_PPS
-            player.Yface_dir += 1
+            player.Y_dir += 1
 
+    @staticmethod
     def exit(player, event):
-        print('EXIT RUN')
-        player.Xface_dir = player.Xface_dir
-        player.Yface_dir = player.Yface_dir
+        print('EXIT WalkingState')
+        player.Xface_dir = player.X_dir
+        player.Yface_dir = player.Y_dir
         if SPACE == event:
-            # self.fire_gun()
             player.fire_gun()
 
+    @staticmethod
     def do(player):
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 14
         player.x += player.x_velocity * game_framework.frame_time
@@ -119,28 +85,34 @@ class RUN:
         player.x = clamp(10, player.x, 780)
         player.y = clamp(20, player.y, 520)
 
+    @staticmethod
     def draw(player):
-        if player.x_velocity < 0 and player.Yface_dir == 0:
-            player.l_image.clip_draw(int(player.frame)*62, 0, 58, 60, player.x, player.y)
-            player.Xface_dir = -1
-        elif player.x_velocity > 0 and player.Yface_dir == 0:
-            player.r_image.clip_draw(int(player.frame)*62, 0, 60, 60, player.x, player.y)
+        if player.x_velocity < 0 and player.y_velocity == 0:
+            player.l_image.clip_draw(int(player.frame) * 62, 0, 58, 60, player.x, player.y)
+        elif player.x_velocity > 0 and player.y_velocity == 0:
+            player.r_image.clip_draw(int(player.frame) * 62, 0, 60, 60, player.x, player.y)
+        elif player.y_velocity < 0 and player.x_velocity == 0:
+            player.d_image.clip_draw(int(player.frame) * 62, 0, 60, 60, player.x, player.y)
+        elif player.y_velocity > 0 and player.x_velocity == 0:
+            player.u_image.clip_draw(int(player.frame) * 62, 0, 60, 60, player.x, player.y)
+        elif player.x_velocity < 0 and player.y_velocity < 0:
+            player.ld_image.clip_draw(int(player.frame) * 54, 0, 54, 60, player.x, player.y)
+        elif player.x_velocity > 0 and player.y_velocity < 0:
+            player.rd_image.clip_draw(int(player.frame) * 44, 0, 44, 60, player.x, player.y)
+        elif player.x_velocity < 0 and player.y_velocity > 0:
+            player.lu_image.clip_draw(int(player.frame) * 49, 0, 49, 60, player.x, player.y)
+        elif player.x_velocity > 0 and player.y_velocity > 0:
+            player.ru_image.clip_draw(int(player.frame) * 37, 0, 37, 60, player.x, player.y)
         else:
-            if player.y_velocity < 0 and player.Yface_dir == -1:
-                if player.Xface_dir == -1:
-                    player.ld_image.clip_draw(int(player.frame) * 54, 0, 54, 60, player.x, player.y)
-                elif player.Xface_dir == 1:
-                    player.rd_image.clip_draw(int(player.frame) * 44, 0, 44, 60, player.x, player.y)
-                else:
-                    player.d_image.clip_draw(int(player.frame) * 62, 0, 60, 60, player.x, player.y)
+            if player.Xface_dir == -1:
+                player.image.clip_draw(66 * 8, 0, 66, 60, player.x, player.y)
+            elif player.Xface_dir == 1:
+                player.image.clip_draw(0, 0, 66, 60, player.x, player.y)
+            elif player.Yface_dir == -1:
+                player.image.clip_draw(66 * 12, 0, 66, 60, player.x, player.y)
+            elif player.Yface_dir == 1:
+                player.image.clip_draw(66 * 4, 0, 66, 60, player.x, player.y)
 
-            elif player.y_velocity > 0 and player.Yface_dir == 1:
-                if player.Xface_dir == -1:
-                    player.lu_image.clip_draw(int(player.frame) * 49, 0, 49, 60, player.x, player.y)
-                elif player.Xface_dir == 1:
-                    player.ru_image.clip_draw(int(player.frame) * 37, 0, 37, 60, player.x, player.y)
-                else:
-                    player.u_image.clip_draw(int(player.frame) * 62, 0, 60, 60, player.x, player.y)
 
 class FIRE:
 
@@ -190,9 +162,8 @@ class FIRE:
 # 3. 상태 변환 구현
 
 next_state = {
-    IDLE:  {RIGHTKEY_UP: RUN,  LEFTKEY_UP: RUN,  UPKEY_UP: RUN,  DOWNKEY_UP: RUN, RIGHTKEY_DOWN: RUN,  LEFTKEY_DOWN: RUN, UPKEY_DOWN: RUN, DOWNKEY_DOWN: RUN, SPACE: FIRE},
-    RUN:   {RIGHTKEY_UP: IDLE, LEFTKEY_UP: IDLE, UPKEY_UP: IDLE, DOWNKEY_UP: IDLE, RIGHTKEY_DOWN: IDLE, LEFTKEY_DOWN: IDLE, UPKEY_DOWN: IDLE, DOWNKEY_DOWN: IDLE, SPACE: FIRE},
-    FIRE: {RIGHTKEY_UP: IDLE,  LEFTKEY_UP: IDLE,  UPKEY_UP: IDLE,  DOWNKEY_UP: IDLE,  RIGHTKEY_DOWN: RUN,  LEFTKEY_DOWN: RUN, UPKEY_DOWN: RUN,  DOWNKEY_DOWN: RUN, SPACE: FIRE}
+    WalkingState:  {RIGHTKEY_UP: WalkingState,  LEFTKEY_UP: WalkingState,  UPKEY_UP: WalkingState,  DOWNKEY_UP: WalkingState, RIGHTKEY_DOWN: WalkingState,  LEFTKEY_DOWN: WalkingState, UPKEY_DOWN: WalkingState, DOWNKEY_DOWN: WalkingState, SPACE: FIRE},
+    FIRE: {RIGHTKEY_UP: WalkingState,  LEFTKEY_UP: WalkingState,  UPKEY_UP: WalkingState,  DOWNKEY_UP: WalkingState,  RIGHTKEY_DOWN: WalkingState,  LEFTKEY_DOWN: WalkingState, UPKEY_DOWN: WalkingState,  DOWNKEY_DOWN: WalkingState, SPACE: FIRE}
 }
 
 
@@ -200,42 +171,41 @@ class Player:
     def __init__(self):
         self.x, self.y = 400, 300
         self.frame = 0
-        self.X_dir, self.Y_dir, self.Xface_dir, self.Yface_dir = 0, 0, 0, -1
+        self.X_dir, self.Y_dir, self.Xface_dir, self.Yface_dir = 0, -1, 0, 0
         self.x_velocity, self.y_velocity = 0, 0
         self.timer = 100
+        self.HP = 1.0 * 100
 
-        self.image = load_image('walk_IDLE.png')
-        self.r_image = load_image('Jog_right.png')
-        self.l_image = load_image('Jog_left.png')
-        self.u_image = load_image('Jog_up.png')
-        self.d_image = load_image('Jog_down.png')
+        self.font = load_font('resources\\ENCR10B.TTF', 16)
 
-        self.ru_image = load_image('Jog_right_up.png')
-        self.rd_image = load_image('Jog_right_down.png')
-        self.lu_image = load_image('Jog_left_up.png')
-        self.ld_image = load_image('Jog_left_down.png')
+        self.image = load_image('resources\\walk_IDLE.png')
+        self.r_image = load_image('resources\\Jog_right.png')
+        self.l_image = load_image('resources\\Jog_left.png')
+        self.u_image = load_image('resources\\Jog_up.png')
+        self.d_image = load_image('resources\\Jog_down.png')
 
-        self.r_fire_image = load_image('Fire_right.png')
-        self.l_fire_image = load_image('Fire_left.png')
-        self.u_fire_image = load_image('Fire_up.png')
-        self.d_fire_image = load_image('Fire_down.png')
+        self.ru_image = load_image('resources\\Jog_right_up.png')
+        self.rd_image = load_image('resources\\Jog_right_down.png')
+        self.lu_image = load_image('resources\\Jog_left_up.png')
+        self.ld_image = load_image('resources\\Jog_left_down.png')
+
+        self.r_fire_image = load_image('resources\\Fire_right.png')
+        self.l_fire_image = load_image('resources\\Fire_left.png')
+        self.u_fire_image = load_image('resources\\Fire_up.png')
+        self.d_fire_image = load_image('resources\\Fire_down.png')
 
         self.event_que = []
-        self.cur_state = IDLE
+        self.cur_state = WalkingState
         self.cur_state.enter(self, None)
 
 
     def update(self):
         self.cur_state.do(self)
 
-        if self.event_que:
+        if len(self.event_que) > 0:
             event = self.event_que.pop()
             self.cur_state.exit(self, event)
-            try:
-                self.cur_state = next_state[self.cur_state][event]  # 예외처리
-            except KeyError:
-                print('ERROR: ', self.cur_state.__name__, '', event_name[event])
-
+            self.cur_state = next_state[self.cur_state][event]
             self.cur_state.enter(self, event)
 
     def handle_event(self, event):
@@ -247,6 +217,7 @@ class Player:
             self.add_event(key_event)
 
     def draw(self):
+        self.font.draw(self.x - 20, self.y + 50, 'HP: %d ' % (self.HP), (255, 0, 0))
         self.cur_state.draw(self)
         debug_print('PPPP')
         # draw_rectangle(*self.get_bb())
@@ -271,7 +242,18 @@ class Player:
     def get_bb(self):
         return self.x - 20, self.y - 30, self.x + 20, self.y + 30
 
+    def get_attack_bb(self):
+        return self.x, self.y - 25, self.x + 30, self.y + 25
+
     def handle_collision(self, other, group):
         pass
+
+    def collision_zombie_player(self, other, group):
+        if group == 'player:mobs':
+            self.HP -= 0.1
+            print(self.HP)
+            if self.HP <= 0:
+                game_world.remove_object(self)
+                game_framework.change_state(gameover_state)
 
 
