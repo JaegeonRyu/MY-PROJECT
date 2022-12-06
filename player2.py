@@ -97,21 +97,33 @@ class WalkingState:
             player.u_image.clip_draw(int(player.frame) * 62, 0, 60, 60, player.x, player.y)
         elif player.x_velocity < 0 and player.y_velocity < 0:
             player.ld_image.clip_draw(int(player.frame) * 54, 0, 54, 60, player.x, player.y)
+            player.cross = 3
         elif player.x_velocity > 0 and player.y_velocity < 0:
             player.rd_image.clip_draw(int(player.frame) * 44, 0, 44, 60, player.x, player.y)
+            player.cross = 4
         elif player.x_velocity < 0 and player.y_velocity > 0:
             player.lu_image.clip_draw(int(player.frame) * 49, 0, 49, 60, player.x, player.y)
+            player.cross = 2
         elif player.x_velocity > 0 and player.y_velocity > 0:
             player.ru_image.clip_draw(int(player.frame) * 37, 0, 37, 60, player.x, player.y)
+            player.cross = 1
         else:
-            if player.Xface_dir == -1:
-                player.image.clip_draw(66 * 8, 0, 66, 60, player.x, player.y)
-            elif player.Xface_dir == 1:
+            if player.Xface_dir == 1:
                 player.image.clip_draw(0, 0, 66, 60, player.x, player.y)
-            elif player.Yface_dir == -1:
-                player.image.clip_draw(66 * 12, 0, 66, 60, player.x, player.y)
+            elif player.cross == 1:
+                player.image.clip_draw(66 * 2, 0, 66, 60, player.x, player.y)
             elif player.Yface_dir == 1:
                 player.image.clip_draw(66 * 4, 0, 66, 60, player.x, player.y)
+            elif player.cross == 2:
+                player.image.clip_draw(66 * 6, 0, 66, 60, player.x, player.y)
+            elif player.Xface_dir == -1:
+                player.image.clip_draw(66 * 8, 0, 66, 60, player.x, player.y)
+            elif player.cross == 3:
+                player.image.clip_draw(66 * 10, 0, 66, 60, player.x, player.y)
+            elif player.Yface_dir == -1:
+                player.image.clip_draw(66 * 12, 0, 66, 60, player.x, player.y)
+            elif player.cross == 4:
+                player.image.clip_draw(66 * 14, 0, 66, 60, player.x, player.y)
 
 
 class FIRE:
@@ -119,25 +131,35 @@ class FIRE:
     def enter(player, event):
         print('ENTER FIRE')
         player.frame = 0
-
         if event == RIGHTKEY_DOWN:
-            player.Xface_dir += 1
-        elif event == LEFTKEY_DOWN:
-            player.Xface_dir -= 1
+            player.x_velocity += RUN_SPEED_PPS
+            player.X_dir += 1
         elif event == RIGHTKEY_UP:
-            player.Xface_dir -= 1
+            player.x_velocity -= RUN_SPEED_PPS
+            player.X_dir -= 1
+        if event == LEFTKEY_DOWN:
+            player.x_velocity -= RUN_SPEED_PPS
+            player.X_dir -= 1
         elif event == LEFTKEY_UP:
-            player.Xface_dir += 1
-        elif event == UPKEY_DOWN:
-            player.Yface_dir += 1
-        elif event == DOWNKEY_DOWN:
-            player.Yface_dir -= 1
+            player.x_velocity += RUN_SPEED_PPS
+            player.X_dir += 1
+
+        if event == UPKEY_DOWN:
+            player.y_velocity += RUN_SPEED_PPS
+            player.Y_dir += 1
         elif event == UPKEY_UP:
-            player.Yface_dir -= 1
+            player.y_velocity -= RUN_SPEED_PPS
+            player.Y_dir -= 1
+        if event == DOWNKEY_DOWN:
+            player.y_velocity -= RUN_SPEED_PPS
+            player.Y_dir -= 1
         elif event == DOWNKEY_UP:
-            player.Yface_dir += 1
+            player.y_velocity += RUN_SPEED_PPS
+            player.Y_dir += 1
 
     def exit(player, event):
+        player.Xface_dir = player.X_dir
+        player.Yface_dir = player.Y_dir
         if SPACE == event:
             player.fire_gun()
 
@@ -149,14 +171,22 @@ class FIRE:
         player.y = clamp(20, player.y, 520)
 
     def draw(player):
-        if player.Xface_dir == -1:
+        if player.Xface_dir == -1 and player.y_velocity == 0:
             player.l_fire_image.clip_draw(int(player.frame) * 59, 0, 59, 60, player.x, player.y)
-        if player.Xface_dir == 1:
+        elif player.Xface_dir == 1 and player.y_velocity == 0:
             player.r_fire_image.clip_draw(int(player.frame) * 59, 0, 59, 59, player.x, player.y)
-        if player.Yface_dir == -1:
+        elif player.Yface_dir == -1 and player.x_velocity == 0:
             player.d_fire_image.clip_draw(int(player.frame) * 37, 0, 37, 60, player.x, player.y)
-        if player.Yface_dir == 1:
+        elif player.Yface_dir == 1 and player.x_velocity == 0:
             player.u_fire_image.clip_draw(int(player.frame) * 32, 0, 32, 60, player.x, player.y)
+        elif player.x_velocity > 0 and player.y_velocity > 0:
+            player.ru_fire_image.clip_draw(int(player.frame) * 49, 0, 49, 60, player.x, player.y)
+        elif player.x_velocity > 0 and player.y_velocity < 0:
+            player.rd_fire_image.clip_draw(int(player.frame) * 49, 0, 49, 60, player.x, player.y)
+        elif player.x_velocity < 0 and player.y_velocity > 0:
+            player.lu_fire_image.clip_draw(int(player.frame) * 49, 0, 49, 60, player.x, player.y)
+        elif player.x_velocity < 0 and player.y_velocity < 0:
+            player.ld_fire_image.clip_draw(int(player.frame) * 49, 0, 49, 60, player.x, player.y)
 
 
 # 3. 상태 변환 구현
@@ -171,11 +201,11 @@ class Player:
     def __init__(self):
         self.x, self.y = 400, 300
         self.frame = 0
-        self.X_dir, self.Y_dir, self.Xface_dir, self.Yface_dir = 0, -1, 0, 0
+        self.X_dir, self.Y_dir, self.Xface_dir, self.Yface_dir = 0, 0, 0, -1
         self.x_velocity, self.y_velocity = 0, 0
         self.timer = 100
         self.HP = 1.0 * 100
-
+        self.cross = 0
         self.font = load_font('resources\\ENCR10B.TTF', 16)
 
         self.image = load_image('resources\\walk_IDLE.png')
@@ -183,7 +213,6 @@ class Player:
         self.l_image = load_image('resources\\Jog_left.png')
         self.u_image = load_image('resources\\Jog_up.png')
         self.d_image = load_image('resources\\Jog_down.png')
-
         self.ru_image = load_image('resources\\Jog_right_up.png')
         self.rd_image = load_image('resources\\Jog_right_down.png')
         self.lu_image = load_image('resources\\Jog_left_up.png')
@@ -193,6 +222,10 @@ class Player:
         self.l_fire_image = load_image('resources\\Fire_left.png')
         self.u_fire_image = load_image('resources\\Fire_up.png')
         self.d_fire_image = load_image('resources\\Fire_down.png')
+        self.ru_fire_image = load_image('resources\\Fire_right_up.png')
+        self.rd_fire_image = load_image('resources\\Fire_right_down.png')
+        self.lu_fire_image = load_image('resources\\Fire_left_up.png')
+        self.ld_fire_image = load_image('resources\\Fire_left_down.png')
 
         self.event_que = []
         self.cur_state = WalkingState
@@ -230,14 +263,23 @@ class Player:
         # 발사 지점에 총알 생성
         if self.Xface_dir == -1:
             bullet = [Bullet(self.x, self.y, self.Xface_dir*2, 0)]
-        if self.Xface_dir == 1:
+        elif self.Xface_dir == 1:
             bullet = [Bullet(self.x, self.y, self.Xface_dir*2, 0)]
-        if self.Yface_dir == -1:
+        elif self.Yface_dir == -1:
             bullet = [Bullet(self.x, self.y, 0, self.Yface_dir*2)]
-        if self.Yface_dir == 1:
+        elif self.Yface_dir == 1:
             bullet = [Bullet(self.x, self.y, 0, self.Yface_dir*2)]
+        elif self.cross == 1:
+            bullet = [Bullet(self.x, self.y, self.Xface_dir*2, self.Yface_dir*2)]
+        elif self.cross == 2:
+            bullet = [Bullet(self.x, self.y, self.Xface_dir*2, self.Yface_dir*2)]
+        elif self.cross == 3:
+            bullet = [Bullet(self.x, self.y, self.Xface_dir*2, self.Yface_dir*2)]
+        elif self.cross == 4:
+            bullet = [Bullet(self.x, self.y, self.Xface_dir*2, self.Yface_dir*2)]
+
         game_world.add_objects(bullet, 1)
-        game_world.add_collision_group(play_state.mobs, bullet, 'bullet:mobs')
+        game_world.add_collision_pairs(play_state.mobs, bullet, 'bullet:mobs')
 
     def get_bb(self):
         return self.x - 20, self.y - 30, self.x + 20, self.y + 30
