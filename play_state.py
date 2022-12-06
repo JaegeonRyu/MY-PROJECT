@@ -7,10 +7,12 @@ import server
 from field_grass import Grass
 from bullet import Bullet
 from player import Player
-from mob import Mob1, Mob2
+from mob import Mob1, Mob2, Mob3
 from game_UI import UI, GUN
 from blood import Blood
 
+mob_count = 20
+all_mob_count = mob_count * 3
 grass = None
 bullet = None
 mobs = []
@@ -27,14 +29,12 @@ def handle_events():
 
 def enter():
     global grass, player, bullet, ui, gun, mobs, blood
+
     ui = UI()
     gun = GUN()
 
     grass = Grass()
     game_world.add_object(grass, 0)
-
-    server.blood = Blood()
-    game_world.add_object(server.blood, 1)
 
     server.player = Player()
     game_world.add_object(server.player, 2)
@@ -42,9 +42,10 @@ def enter():
     game_world.add_object(ui, 1)
     game_world.add_object(gun, 2)
 
-    mobs = [Mob1() for i in range(1)] + [Mob2() for i in range(1)]
+    mobs = [Mob1() for i in range(mob_count)] + [Mob2() for i in range(mob_count)] + [Mob3() for i in range(mob_count)]
     game_world.add_objects(mobs, 1)
     game_world.add_collision_pairs(server.player, mobs, 'player:mobs')
+    # game_world.add_collision_pairs(mobs, zom, 'mobs:mobs')
 
 def update():
     for game_object in game_world.all_objects():
@@ -52,10 +53,14 @@ def update():
     delay(0.01)
 
     for a, b, group in game_world.all_collision_pairs():
-        if collide(a, b):
-            print('collision by ', group)
-            a.handle_collision(b, group)
-            b.handle_collision(a, group)
+        if collide(a, b, group):
+            # print('collide ', group)
+            if group == 'bullet:mobs' or group == 'mobs:mobs':
+                a.handle_collision(b, group)
+                b.handle_collision(a, group)
+            elif group == 'player:mobs':
+                a.collision_zombie_player(b, group)
+                b.collision_zombie_player(a, group)
 
 def draw_world():
     for game_object in game_world.all_objects():
@@ -66,7 +71,26 @@ def draw():
     draw_world()
     update_canvas()
 
-def collide(a, b):
+def collide(a, b, group):
+    if group == 'bullet:mobs':
+        la, ba, ra, ta = a.get_bb()
+        lb, bb, rb, tb = b.get_bb()
+
+    elif group == 'player:mobs':
+        la, ba, ra, ta = a.get_bb()
+        lb, bb, rb, tb = b.get_attack_bb()
+
+    else:
+        pass
+
+    if la > rb: return False
+    if ra < lb: return False
+    if ta < bb: return False
+    if ba > tb: return False
+
+    return True
+
+def collision_zombie(a, b):
     la, ba, ra, ta = a.get_bb()
     lb, bb, rb, tb = b.get_bb()
 

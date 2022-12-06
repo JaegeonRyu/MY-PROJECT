@@ -6,7 +6,7 @@ WinW = 800
 WinH = 600
 
 pico2d.open_canvas(WinW, WinH)
-game_framework.run(play_state)
+game_framework.run(logo_state)
 pico2d.close_canvas()
 
 ####

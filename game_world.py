@@ -58,16 +58,13 @@ def add_collision_pairs(a, b, group):
         else:
             collision_group[group][0].append(b)
 
-    print(collision_group)
-
-
+    # print(collision_group)
 
 def all_collision_pairs():
     for group, pairs in collision_group.items():
         for a in pairs[0]:
             for b in pairs[1]:
                 yield a, b, group
-
 
 def remove_collision_object(o):
     for pairs in collision_group.values():
