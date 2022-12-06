@@ -17,11 +17,16 @@ class Bullet:
     image = None
 
     def __init__(self, x, y, x_velocity, y_velocity):
-        if Bullet.image == None:
+        if Bullet.image is None:
             Bullet.image = load_image('resources\\bullet.png')
+
         self.x, self.y, self.x_velocity, self.y_velocity = x, y, x_velocity, y_velocity
         self.bullet_frame = 0
         self.frame = 0
+
+        self.gun_sound = load_wav('resources\\gun.wav')
+        self.gun_sound.set_volume(20)
+        self.gun_sound.play()
 
     def return_xy(self, x, y, xd, yd):
         self.x, self.y, self.x_velocity, self.y_velocity = x, y, xd, yd
@@ -29,20 +34,36 @@ class Bullet:
     def draw(self):
         self.bullet_frame = (self.bullet_frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 4
 
-        if self.x_velocity > 0:
+        if self.x_velocity > 0 and self.y_velocity == 0:
             self.x += self.x_velocity * BULLET_SPEED_PPS * game_framework.frame_time
             self.image.clip_draw(int(self.bullet_frame) * 80, 80, 80, 80, self.x+15, self.y+15)
-        if self.y_velocity > 0:
+        elif self.x_velocity > 0 and self.y_velocity > 0:
+            self.x += self.x_velocity * BULLET_SPEED_PPS * game_framework.frame_time
+            self.y += self.y_velocity * BULLET_SPEED_PPS * game_framework.frame_time
+            self.image.clip_composite_draw(int(self.bullet_frame)*80, 80, 80, 80, 3.141592 / 4, '', self.x, self.y, 80, 80)
+        elif self.y_velocity > 0 and self.x_velocity == 0:
             self.y += self.y_velocity * BULLET_SPEED_PPS * game_framework.frame_time
             self.image.clip_composite_draw(int(self.bullet_frame)*80, 80, 80, 80, 3.141592 / 2, '', self.x, self.y, 80, 80)
-        if self.x_velocity < 0:
+        elif self.x_velocity < 0 and self.y_velocity > 0:
+            self.x += self.x_velocity * BULLET_SPEED_PPS * game_framework.frame_time
+            self.y += self.y_velocity * BULLET_SPEED_PPS * game_framework.frame_time
+            self.image.clip_composite_draw(int(self.bullet_frame)*80, 80, 80, 80, 3.141592 * 3/4, '', self.x, self.y, 80, 80)
+        elif self.x_velocity < 0 and self.y_velocity == 0:
             self.x += self.x_velocity * BULLET_SPEED_PPS * game_framework.frame_time
             self.image.clip_composite_draw(int(self.bullet_frame)*80, 80, 80, 80, 3.141592, '', self.x+15, self.y+15, 80, 80)
-        if self.y_velocity < 0:
+        elif self.x_velocity < 0 and self.y_velocity < 0:
+            self.x += self.x_velocity * BULLET_SPEED_PPS * game_framework.frame_time
+            self.y += self.y_velocity * BULLET_SPEED_PPS * game_framework.frame_time
+            self.image.clip_composite_draw(int(self.bullet_frame)*80, 80, 80, 80, -3.141592 * 3/4, '', self.x, self.y, 80, 80)
+        elif self.y_velocity < 0 and self.x_velocity == 0:
             self.y += self.y_velocity * BULLET_SPEED_PPS * game_framework.frame_time
             self.image.clip_composite_draw(int(self.bullet_frame)*80, 80, 80, 80, -3.141592 / 2, '', self.x, self.y, 80, 80)
+        elif self.x_velocity > 0 and self.y_velocity < 0:
+            self.x += self.x_velocity * BULLET_SPEED_PPS * game_framework.frame_time
+            self.y += self.y_velocity * BULLET_SPEED_PPS * game_framework.frame_time
+            self.image.clip_composite_draw(int(self.bullet_frame)*80, 80, 80, 80, -3.141592/4, '', self.x, self.y, 80, 80)
 
-        draw_rectangle(*self.get_bb())
+        # draw_rectangle(*self.get_bb())
 
     def update(self):
         self.x += self.x_velocity
